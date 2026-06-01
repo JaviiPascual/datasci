@@ -1,0 +1,153 @@
+---
+title: 'Activity 4: Tidyverse'
+author: "Javi Pascual"
+date: "2026-06-01"
+output: html_document
+---
+
+## Summary of answers
+A.
+5) IT2P7 and IT3P0 has the most count of small trees (both have 10)
+Transect Htypes SmallTrees FloweringTrees
+1    IT2P7    CVT         10              3
+2    IT3P0    CVT         10              6
+3    IT3P1    CVT          5              6
+4    IT2P6    CVT          4              3
+5    IT3P2    CVT          0              7
+6    IT3P3    CVT          0              6
+7    IT3P4    CVT          0             31
+
+6) ASG and ESG do not differ significantly (5.26 and 5.38)
+Htypes SL_mean
+<chr>    <dbl>
+1 ASG       5.26
+2 CVT       8.86
+3 ESG       5.38
+
+7) Transects with no difference are: IT1P5, IT2P5, IT3P1, ST1P2, ST1P3. and more 
+Transect Htypes SmallTrees FloweringTrees HerbGroundDiff
+1     IT1P0    ESG         20             10            -10
+2     IT1P1    ESG         15              3            -37
+3     IT1P2    ESG         10              6            -55
+4     IT1P3    ESG         15              5            -28
+5     IT1P4    ESG         15              5            -10
+6     IT1P5    ESG          4              4              0
+7     IT1P6    ESG         16              4             40
+8     IT2P0    ESG         13              4             50
+9     IT2P1    ESG          3              3             35
+10    IT2P2    ESG          4              3            -20
+11    IT2P3    ESG          7              8             40
+12    IT2P4    ESG         10              9             30
+13    IT2P5    ESG         10              6              0
+14    IT2P6    CVT          4              3             30
+15    IT2P7    CVT         10              3             30
+16    IT3P0    CVT         10              6            -15
+17    IT3P1    CVT          5              6              0
+18    IT3P2    CVT          0              7            -15
+19    IT3P3    CVT          0              6            -58
+20    IT3P4    CVT          0             31           -100
+21    ST1P0    ASG         16              3            -20
+22    ST1P1    ASG         10              2            -30
+23    ST1P2    ASG          8              4              0
+24    ST1P3    ASG         13              3              0
+25    ST1P4    ASG         10              1            -30
+26    ST1P5    ASG         11              3            -30
+27    ST1P6    ASG         16              3            -10
+28    ST1P7    ASG         10              1              0
+29    ST1P8    ASG         13              1            -20
+30    ST2P0    ASG          4              9             10
+31    ST2P1    ASG          3              8             20
+32    ST2P2    ASG          7              8             15
+33    ST2P3    ASG          8              8             10
+34    ST2P4    ASG          2              7            -10
+35    ST2P5    ASG         10              6              0
+36    ST2P6    ASG          0              6             -5
+37    ST2P7    ASG          5              6            -15
+38    ST2P8    ASG          7              9            -20
+39    ST3P0    ASG          8              5             10
+40    ST3P1    ASG          3              2              0
+41    ST3P2    ASG          8              6              0
+42    ST3P3    ASG          9              7            -35
+43    ST3P4    ASG          9              6            -30
+44    ST3P5    ASG         14              3            -30
+45    ST3P6    ASG          6              9            -50
+46    ST3P7    ASG          3             10            -70
+47    ST3P8    ASG          3              6            -60
+
+
+B. REFLECTION
+How does using tidyverse compare to Activity 03, which primarily used base R? Which functions do you find more intuitive, and which ones are less so?
+  Personally, using tidyverse is significantly easier than the previous use of base R. The functions are more intuitive and in tidyverse than base R. The overall usage
+of tidyverse is much more straightforward and does not seem to be likely to be used with brute force coding due to its ease in usage.
+
+## Setup tidyverse ##
+install.packages("tidyverse")
+library(tidyverse)
+
+
+```{r chunk1, echo = TRUE}
+## Set directory ##
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27")
+getwd()
+
+```
+
+```{r chunk2, echo = TRUE}
+## For dataframe ##
+library(tidyverse)
+my_data <- read.csv("habitat_types.csv")
+
+str(my_data)
+
+my_data |> glimpse()
+
+```
+
+```{r chunk3, echo = TRUE}
+## Subset, filter, and arrange data ##
+subset1_mydata <- select(my_data, Transect, Htypes, SmallTrees, FloweringTrees)
+
+filter_subset1 <- subset1_mydata[subset1_mydata$Htypes == "CVT",]
+
+descen_subset1 <- arrange(filter_subset1, desc(SmallTrees))
+print(descen_subset1)
+
+```
+
+```{r chunk4, echo = TRUE}
+## Mean of flowering trees ##
+mydata_formean <- group_by(my_data, Htypes)
+
+mean_values <- summarise(mydata_formean, SL_mean = mean(FloweringTrees))
+print(mean_values)
+
+```
+
+```{r chunk5, echo = TRUE}
+## Adding the difference of herbscover and groundcover ##
+self_df_mod <- subset1_mydata %>%
+  mutate(HerbGroundDiff = my_data$HerbsCover - my_data$GroundCover)
+print(self_df_mod)
+
+```
+
+```{r chunk6, echo = TRUE}
+## Using pivot wider of self_df_mod ##
+mod_wider <- self_df_mod |> pivot_wider(names_from = Htypes, values_from = c(SmallTrees, FloweringTrees, HerbGroundDiff))
+print(mod_wider)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
