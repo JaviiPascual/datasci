@@ -1,0 +1,221 @@
+---
+title: 'Activity 03: Summary statistics, frequency distribution, and basic graphical
+  representation'
+author: "Javi Pascual"
+date: "2026-06-01"
+output: html_document
+---
+
+## Summary of Answers
+
+### Most and least observed species
+* **Most Observed Species:** Phlo (377 observations)
+* **Least Observed Species:** Babu, Geat, Hety, Bosc, Drru,Apbo (1 observation each)
+
+### Mean observations
+         ASG     CVT ESG    OGF
+Babu 0.00000000   0   0  0.04347826
+Geat 0.00000000   0   0  0.04347826
+Hety 0.06666667   0   0  0.00000000
+Bosc 0.06666667   0   0  0.00000000
+Drru 0.06666667   0   0  0.00000000
+Apbo 0.00000000   0   0  0.04347826
+Phlo 1.46666667   4   0 15.08695652
+
+* **Habitat type with the highest species counts:** OGF (350 total observations)
+* **Habitat types with no species observations:** None
+
+################### INTERPRETATION #####################
+
+  In the data from the article of Supsup et al. (2020) entitled "Variation in species richness, 
+composition and herpetological community structure across a tropical habitat gradient of 
+Palawan Island, Philippines", it can be seen that in terms of the total community observations 
+across the dataset, Advanced Secondary Growth (ASG) had the highest amount with 58, which is then 
+followed by Old Growth Forest (OGF, 48), Early Secondary Growth (ESG, 28), and Cultivation (CVT, 1),
+which aligns with the aforementioned paper. However, the area with the most species counts is the OGF
+with a significant different in amount of 350, followed by ASG (25), CVT (8), and ESG (0). It can then
+be inferred that despite the amount of observations in ASG, it does not necessarily mean that it also hosts
+the most species-rich area.
+
+  The mean distribution provides insight into the dominant and specialized species in the different study sites.
+The most observed species known aiss "Phlo" and the least observed species are Babu, Geat, Hety, Bosc, Drru, 
+and Apbo. As for the Species Total Abundance (SPPTotal), it is seen in the scatterplot that it `most
+apparent at lower elevations and would greatly decrease between 200 and 400 meters. In the histogram, 
+it is heavily skewed with most of the obsercations found in the left part of the histogram. This can be
+inferred to as the observed species to prefer the temperature or environment of that specific area as opposed
+to the other areas.
+
+################### END #####################
+
+## Install and load packages rmarkdown and knitr ##
+install.packages("rmarkdown")
+install.packages("knitr")
+install.packages("pander")
+library(rmarkdown)
+library(knitr)
+library(pander)
+
+
+```{r}
+
+## Set working directory ##
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27")
+getwd()
+
+```
+
+```{r}
+
+## Data cleaning ##
+my_data <- read.csv("Data.csv")
+remove_NA <- complete.cases(my_data)
+head(my_data[remove_NA, ])
+clean_data <- my_data[remove_NA, ]
+
+```
+
+```{r}
+
+## Elevation ##
+my_elevation <- clean_data$Elev
+
+mean(my_elevation)
+
+sd(my_elevation)
+
+range(my_elevation)
+```
+
+```{r}
+
+## Species data (G-AG) ##
+my_speciesdata <- clean_data [ , 7:33]
+print(my_speciesdata)
+```
+
+```{r}
+
+## Typical loop ##
+list_species <- list()
+
+min_count <- Inf
+max_count <- -1
+min_species <- NULL
+max_species <- NULL
+current_name <- NULL
+current_count <- -1
+i <- 0
+
+for (i in 1:27) {
+  current_count <- sum(my_speciesdata[ , i])
+  current_name <- names(my_speciesdata) [i]
+  
+  if (current_count < min_count) {
+    min_count <- current_count
+    min_species <- current_name
+  } else if (current_count == min_count) {
+    min_species <- c(min_species, current_name)
+  }
+  
+  if (current_count > max_count) {
+    max_count <- current_count
+    max_species <- current_name
+  } else if(current_count == max_count) {
+    max_species <- c(max_species, current_name)
+  }
+  
+  i <- i + 1
+}
+
+print("Least observations:")
+print(min_species)
+print(min_count)
+# WILL PRINT
+# [1] "Least observations:"
+# [1] "Babu" "Geat" "Hety" "Bosc" "Drru" "Apbo"
+# [1] 1
+#
+
+print("Most observations:")
+print(max_species)
+print(max_count)
+# WILL PRINT
+# [1] "Most observations:"
+# [1] "Phlo"
+# [1] 377
+
+
+
+## Compact loop ##
+species_counts <- sapply(my_speciesdata, sum)
+
+min_spcounts <- min(species_counts)
+max_spcounts <- max(species_counts)
+
+min_spname <- names(species_counts[species_counts == min_spcounts])
+max_spname <- names(species_counts[species_counts == max_spcounts])
+
+print("Least observations:")
+print(min_spname)
+print(min_spcounts)
+# WILL PRINT
+# [1] "Least observations:"
+# [1] "Babu" "Geat" "Hety" "Bosc" "Drru" "Apbo"
+# [1] 1
+
+
+print("Most observations:")
+print(max_spname)
+print(max_spcounts)
+# WILL PRINT
+# [1] "Most observations:"
+# [1] "Phlo"
+# [1] 377
+
+```
+
+```{r}
+
+## Htypes ##
+ASG_count <- 0
+CVT_count <- 0
+ESG_count <- 0
+OGF_count <- 0
+combine_htypes <- cbind(clean_data["Htypes"], clean_data["Babu"], clean_data["Geat"], clean_data["Hety"], clean_data["Bosc"], clean_data["Drru"], clean_data["Apbo"], clean_data["Phlo"])
+
+mostsp_htmean <- tapply(combine_htypes$Phlo, combine_htypes$Htypes, mean)
+
+split_ht <- split (combine_htypes, combine_htypes$Htypes)
+
+ht_mean <- sapply(split_ht, function(x) {
+    colMeans(x[ ,2:8])
+})
+  
+ht_sum <- sapply(split_ht, function(x) {
+    sum(x[,2:8])
+})
+
+print(ht_sum)
+# WILL PRINT
+# ASG CVT ESG OGF 
+# 25   8   0 350 
+
+```
+
+```{r}
+## Plots ##
+plot_all <- clean_data[ , c("Htypes", "Elev", "SPPTotal")]
+
+# Scatter plot #
+plot(x = plot_all$Elev, y = plot_all$SPPTotal, xlab = "Elevation (meters)", ylab = "Species Total Count (SPPTotal)", main = "Species Total Count vs. Elevation", col = as.factor(plot_all$Htypes), pch = 19)
+
+total_habitat <- tapply(plot_all$SPPTotal, plot_all$Htypes, sum)
+
+# Bar plot #
+barplot(total_habitat, xlab = "Habitat Type (Htypes)", ylab = "Total Species Observations", main = "Total Species Observed per Habitat Type", col = "orange")
+
+# Histogram #
+hist(plot_all$SPPTotal, xlab = "Species Total Counts (SPPTotal)", ylab = "Frequency (Number of Sites/Rows)", main = "Distribution of Total Species Counts", col = "orange", breaks = 12)
+
+```
+
