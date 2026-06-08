@@ -10,4 +10,4 @@ https://JaviiPascual.github.io/datasci/myrmarkdown/Pascual_Act6_2.html
 
 
 # Activity 7
-https://JaviiPascual.github.io/datasci/Act 7/Pascual_K-means.html
+https://JaviiPascual.github.io/datasci/Act%207/Pascual_K-means.html
