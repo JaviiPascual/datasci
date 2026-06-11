@@ -1,0 +1,101 @@
+---
+title: "Pascual_hclust"
+author: "Javi Pascual"
+date: "2026-06-10"
+output: html_document
+---
+
+
+```{r chunk1, echo=TRUE}
+## Set working directory and package ##
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27")
+library(cluster)
+library(ggplot2)
+
+## Read data ##
+my_data <- read.csv("morphology_data.csv")
+
+## Remove unnecessary columns ##
+reduced_data <- my_data[ , 3:21]
+
+## Remove NAs ##
+remove_NA <- complete.cases(reduced_data)
+
+head(reduced_data[remove_NA, ])
+
+clean_data <- reduced_data[remove_NA, ]
+
+## Standardize data ##
+scaled_data <- scale(clean_data)
+
+```
+
+```{r chunk2, echo=TRUE}
+## Euclidean distance ##
+ed_data <- dist(scaled_data, method = "euclidean")
+
+```
+
+```{r chunk3, echo=TRUE}
+## Single linkage ##
+single_clust <- hclust(ed_data, method = "single")
+
+plot(single_clust, main = "Single Linkage")
+
+rownames(scaled_data) <- my_data$Pop
+
+plot(single_clust, main = "Single Linkage", labels = rownames(scaled_data), cex = 0.7)
+
+```
+
+```{r chunk4, echo=TRUE}
+## Ward's method ##
+ward_clust <- hclust(ed_data, method = "ward.D2")
+
+plot(ward_clust, main = "Ward D2", labels = rownames(scaled_data), cex = 0.7)
+
+```
+
+```{r chunk5, echo=TRUE}
+## For loop function using Silhouette scores ##
+results <- data.frame()
+models <- list(Single = single_clust, Ward = ward_clust)
+
+for(method_name in names(models)) {
+    hc_model <- models[[method_name]]
+    for (k in 2:10) {
+        clusters <- cutree(hc_model, k = k)
+        
+        slhtt <- silhouette(clusters, ed_data)
+        avg_slhtt <- mean(slhtt[ , 3])
+        
+        results <- rbind(results, data.frame(Method = method_name, K = k, Avg_Sil_Width = avg_slhtt))
+        
+    }
+}
+
+## Dendrogram ##
+plot(single_clust, main = "Single Linkage Dendrogram", labels = rownames(scaled_data), cex = 0.7, xlab = "Populations", sub = "")
+
+rect.hclust(single_clust, k = 2, border = c("orange", "aquamarine"))
+
+plot(ward_clust, main = "Ward D2 Dendrogram", labels = rownames(scaled_data), cex = 0.7, xlab = "Populations", sub = "")
+
+rect.hclust(ward_clust, k = 2, border = c("aquamarine","orange", "skyblue"))
+
+```
+
+```{r chunk6, echo=TRUE}
+# Question 1
+# The previous activity used K-means and the current activity used Hierarchical clustering. The former method uses the distance to the cluster's centroid; while the latter uses the distance between two close points of neighboring groups (Single linkage) or alters the total cluster variance by minimizing in each cluster (Ward's linkage)
+
+# Question 2
+# The clusters are not consistent. This could possible be due to the methodology in the formation of the clustering between the two methods of clustering. It could influence the interpretation of biological patterns in data by having different areas of application. K-means has advantages in guaranteeing merging data and specialization of clusters of varying sizes and shape. Meanwhile, hierarchical clustering has advantages due to its accessibility to numerous form or varying distance of clusters. It also is able to be applied to attribute types. However, K-means is very difficult to predict and does not work with global clusters. Hierarchical clustering has also disadvantages in terms of how it can only handle small datasets (GeeksforGeeks, 2020).
+
+# GeeksforGeeks. (2020, July 8). Difference between K means and Hierarchical Clustering. GeeksforGeeks. https://www.geeksforgeeks.org/machine-learning/difference-between-k-means-and-hierarchical-clustering/
+
+
+
+
+
+
