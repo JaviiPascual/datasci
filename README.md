@@ -21,3 +21,4 @@ https://JaviiPascual.github.io/datasci/Act9/Pascual_Act9.html
 
 # Activity 10
 https://JaviiPascual.github.io/datasci/Act10/Pascual_gis.html
+PDF Map: https://JaviiPascual.github.io/datasci/Act10/Pascual_gisplot.pdf
