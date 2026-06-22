@@ -18,3 +18,6 @@ https://JaviiPascual.github.io/datasci/Act8/Pascual_hclust.html
 
 # Activity 9
 https://JaviiPascual.github.io/datasci/Act9/Pascual_Act9.html
+
+# Activity 10
+https://JaviiPascual.github.io/datasci/Act10/Pascual_gis.html
