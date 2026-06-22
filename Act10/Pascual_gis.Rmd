@@ -1,0 +1,62 @@
+---
+title: "Pascual_gis"
+author: "Javi Pascual"
+date: "2026-06-22"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+``` {r chunkA, echo = TRUE}
+### Set working directory ###
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27/Act10_GIS")
+
+### Read as dataframe ###
+my_data <- read.csv("occurence.csv")
+
+### Subset data ###
+reduced_data <- my_data[ , 98:99]
+
+### Remove NAs ###
+remove_NA <- complete.cases(reduced_data)
+
+head(reduced_data[remove_NA, ])
+
+clean_data <- reduced_data[remove_NA, ]
+
+### Packages ##$
+#install.packages(c("maps", "osmdata", "sf", "terra"))
+library(maps)
+library(osmdata)
+library(sf)
+library(terra)
+library(ggplot2)
+library(dplyr)
+
+```
+
+``` {r chunkB, echo = TRUE}
+### DIVA-GIS file for map plotting ###
+ph_data <- st_read("PHL_adm1.shp")
+
+samar_data <- ph_data %>% filter(NAME_1 %in% c("Eastern Samar", "Samar", "Northern Samar"))
+
+ggplot() + geom_sf(data = samar_data, fill = "lightgray", color = "black") + labs(title = "Samar Province")
+
+### elevation ###
+ph_alt <- rast("ph_ strm_geo.tif")
+
+if(st_crs(samar_data) != st_crs(ph_alt)) {
+  samar_data <- st_transform(samar_data, st_crs(ph_alt))
+}
+
+samar_alt <- crop(ph_alt, samar_data) %>% mask(samar_data)
+
+names(samar_alt) <- "elevation"
+
+alt_dataframe <- as.data.frame(samar_alt, xy = TRUE)
+
+### Plotting ###
+ggplot() + geom_tile(data = alt_dataframe, aes(x = x, y = y, fill = elevation)) + scale_fill_gradientn(colors = c("aquamarine", "orange", "pink", "red", "black"), name = "Elevation") + geom_sf(data = samar_data, fill = "transparent", color = "black", linewidth = 0.5) + geom_point(data = clean_data, aes(x = decimalLongitude, y = decimalLatitude, color = "Playmantis bayani"), size = 3) + scale_color_manual(values = c("Playmantis bayani" = "darkblue"), name = "Species") + coord_sf() + labs(title = "Topographic Map of Playmantis bayani Distribution", subtitle = "Samar, Philippines", x = "Longitude (°E)", y = "Latitude (°N)") + theme_bw() + theme(plot.title = element_text(face = "bold", size = 14), legend.position = "right")
+
+```
