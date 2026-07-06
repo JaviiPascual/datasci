@@ -23,3 +23,8 @@ https://JaviiPascual.github.io/datasci/Act9/Pascual_Act9.html
 https://JaviiPascual.github.io/datasci/Act10/Pascual_gis.html
 
 PDF Map: https://JaviiPascual.github.io/datasci/Act10/Pascual_gisplot.pdf
+
+# Activity 11
+https://JaviiPascual.github.io/datasci/Act11/Pascual_Act11.html
+
+PDF: https://JaviiPascual.github.io/datasci/Act11/Simple_LinearRegression.pdf
