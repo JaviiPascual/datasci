@@ -1,0 +1,157 @@
+---
+title: "Pascual_linear_reg"
+author: "Javi Pascual"
+date: "2026-07-06"
+output: html_document
+---
+
+```{r chunkA, echo=TRUE}
+### Set working directory ###
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27/Act 11_Linear_Regression")
+
+### Read as dataframe ###
+my_data <- read.csv("herpetozoa-033-095-s001.csv")
+
+### Remove NAs ###
+remove_NA <- complete.cases(my_data)
+head(my_data[remove_NA, ])
+clean_data <- my_data[remove_NA, ]
+
+### Packages ##$
+library(maps)
+library(osmdata)
+library(sf)
+library(terra)
+library(ggplot2)
+library(dplyr)
+
+```
+
+```{r chunkB, echo=TRUE}
+## Elevation  ##
+ph_elev <- rast("ph_ strm_geo.tif")
+
+## Subset longtitude and latitude ##
+reduced_data <- clean_data[ , 2:3]
+
+## Convert coordinates to spatial vector ##
+spatvect_data <- vect(reduced_data)
+
+## Extract elevation data ##
+extracted_data <-  terra::extract(ph_elev, spatvect_data)
+
+## Subset SPPTotal ##
+subset_specrich <- clean_data[ , 6]
+
+## Combine SPPTotal with extracted elevation ##
+combined_data <-  cbind(subset_specrich, extracted_data)
+
+## Rename ##
+names(combined_data)[names(combined_data) == "Band_1"] <- "Elevation"
+
+names(combined_data)[names(combined_data) == "subset_specrich"] <- "Species_Richness"
+
+```
+
+```{r chunkC, echo=TRUE}
+## Simple linear regression plot  ##
+
+# Independent variable #
+independent_var <- combined_data$Elevation
+
+# Dependent variable #
+dependent_var <- combined_data$Species_Richness
+
+## Mean ##
+x_mean <- mean(independent_var)
+y_mean <- mean(dependent_var)
+
+## Slope ##
+
+slope_reg <- sum((independent_var - x_mean) * (dependent_var - y_mean)) / sum((independent_var - x_mean)^2)
+
+## Intercept ##
+intercept_reg <- y_mean - slope_reg * x_mean
+
+## Check v values ##
+x_mean
+y_mean
+slope_reg
+intercept_reg
+
+## Equation ##
+cat("Regression Equation:\n")
+cat("y =", round(intercept_reg, 3), "+", round(slope_reg,3), "x\n")
+
+## y hat ##
+y_hat <- intercept_reg + slope_reg * independent_var
+
+y_hat
+
+data.frame(Elevation = independent_var, SpeciesRichness = dependent_var, Predicted = round(y_hat,2))
+
+##  Plot with fitted line ##
+plot(independent_var, dependent_var, pch = 19, col = "orange", xlab = "Elevation", ylab = "Species Richness", main = "Simple Linear Regression")
+
+abline(intercept_reg, slope_reg, col = "aquamarine", lwd = 2)
+
+
+## Plot with predicted values ##
+plot(independent_var, dependent_var, pch = 19, col = "orange", xlab = "Elevation", ylab = "Species Richness", main = "Simple Linear Regression")
+
+abline(intercept_reg, slope_reg, col = "aquamarine", lwd = 2)
+
+## Predicted values ##
+points(independent_var, y_hat, pch = 17,      # Triangle
+       col = "pink", cex = 1.2)
+
+## Residual lines ##
+segments(x0 = independent_var, y0 = dependent_var, x1 = independent_var, y1 = y_hat, lty = 2, col = "lightgray")
+
+## Legend ##
+legend("topright", legend = c("Observed", "Predicted", "Regression Line"), pch = c(19, 17, NA), lty = c(NA, NA, 1), col = c("orange", "pink", "aquamarine"), lwd = c(NA, NA, 2), bty = "n")
+
+## SSE, SST, and R squared ##
+SSE <- sum((dependent_var - y_hat)^2)
+SST <- sum((dependent_var - y_mean)^2)
+R_squared <- 1 - (SSE / SST)
+
+## Check values ##
+SSE
+SST
+R_squared
+
+```
+
+What can you infer about the relationship between species and elevation?
+A negative relationship can be observed between elevation and species richness. This is indicated by the regression line's orientation, which in this case is found to be proceeding downards as the graph moves to the right. Between the elevations of 600m to 1000m, the species richness is also found to significantly reduce, which can be inferred as to the possible limitation for the particular observed species.
+
+
+```{r chunkD, echo=TRUE}
+## Multiple linear regression ##
+
+# Read as dataframe #
+ph_precip <- rast("annual_precipitation.tif")
+ph_temp <- rast("annual_temperature.tif")
+
+## Extract data ##
+extracted_precip <-  terra::extract(ph_precip, spatvect_data)
+extracted_temp <-  terra::extract(ph_temp, spatvect_data)
+
+## Check values ##
+extracted_precip
+extracted_temp
+
+## Combine ##
+combined_multi <-  combined_data |> mutate(Precipitation = extracted_precip [ ,2], Temperature = extracted_temp [,2])
+
+## Fit regression model ##
+reg_model <- lm(Species_Richness ~ Elevation + Precipitation + Temperature, data = combined_multi)
+
+## Display model summary
+summary(reg_model)
+
+```
+
+Which relationship is statistically significant?
+Precipitation and temperature
