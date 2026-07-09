@@ -1,0 +1,159 @@
+---
+title: "Pascual_logistic_reg"
+author: "Javi Pascual"
+date: "2026-07-09"
+output: html_document
+---
+
+``` {r chunkA, echo = TRUE}
+### Set working directory ###
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27/Act12")
+
+### Read as dataframe ###
+my_data <- read.csv("ph_mouse_deer.csv")
+
+### Remove NAs ###
+remove_NA <- complete.cases(my_data)
+head(my_data[remove_NA, ])
+clean_data <- my_data[remove_NA, ]
+
+clean_data
+
+### Packages ###
+library(maps)
+library(osmdata)
+library(sf)
+library(terra)
+library(ggplot2)
+library(dplyr)
+
+```
+
+```{r chunkB, echo=TRUE}
+
+### Map generation ###
+
+ph_data <- st_read("PHL_adm1.shp")
+
+palawan_data <- ph_data %>% filter(NAME_1 == "Palawan")
+
+palawan_plot <- ggplot() +
+  geom_sf(data = palawan_data,
+          fill = "lightblue",
+          color = "black",
+          linewidth = 0.3) +
+  geom_point(data = clean_data, 
+             aes(x = Longitude, y = Latitude, fill = HabitatCode),
+             shape = 21,
+             color = "black",
+             size = 3.5,
+             stroke = 1.2) +
+  coord_sf(xlim = c(116.7, 117.5), 
+           ylim = c(7.5, 8.5), 
+           expand = FALSE) +
+  labs(title = "Philippine Mouse Deer Observation Localities",
+       x = "Longitude (°E)",
+       y = "Latitude (°N)",
+       fill = "Habitat Code") +
+  theme_bw()
+
+print(palawan_plot)
+
+# Save as PDF #
+#pdf("Pascual_PalawanMap.pdf", width = 7, height = 6)
+#print(palawan_plot)
+
+```
+
+```{r chunkC, echo=TRUE}
+
+## Regression model ##
+mlogr_model <- glm(Detected ~ AverageDistance + Effort + HabitatCode, family = binomial, data = clean_data)
+
+summary(mlogr_model)
+
+```
+
+```{r chunkD, echo=TRUE}
+### Curve plots ###
+
+## 1. AverageDistance ##
+newdata_dist <- data.frame(
+  AverageDistance = seq(min(clean_data$AverageDistance), max(clean_data$AverageDistance), length.out = 100),
+  Effort = mean(clean_data$Effort),
+  HabitatCode = clean_data$HabitatCode[1] # Robust fix for length 0 error
+)
+
+# Changed 'model' to 'mlogr_model' to match your regression step
+newdata_dist$prob <- predict(mlogr_model,
+                             newdata = newdata_dist,
+                             type = "response")
+
+# Export to PDF file #
+pdf("Surname_Curve_Distance.pdf", width = 6, height = 4)
+plot(clean_data$AverageDistance, clean_data$Detected,
+     pch = 19,
+     xlab = "Average Distance",
+     ylab = "Probability",
+     ylim = c(0,1),
+     main = "Multiple Logistic Regression Curve: Average Distance")
+lines(newdata_dist$AverageDistance,
+      newdata_dist$prob,
+      col = "blue",
+      lwd = 3)
+dev.off() # Don't forget to close the PDF device!
+
+# Render output #
+plot(clean_data$AverageDistance, clean_data$Detected,
+     pch = 19,
+     xlab = "Average Distance",
+     ylab = "Probability",
+     ylim = c(0,1),
+     main = "Multiple Logistic Regression Curve: Average Distance")
+lines(newdata_dist$AverageDistance,
+      newdata_dist$prob,
+      col = "blue",
+      lwd = 3)
+
+```
+
+```{r chunkE, echo=TRUE}
+## 2. Effort ##
+newdata_effort <- data.frame(
+  AverageDistance = mean(clean_data$AverageDistance),
+  Effort = seq(min(clean_data$Effort), max(clean_data$Effort), length.out = 100),
+  HabitatCode = clean_data$HabitatCode[1] # Robust fix for length 0 error
+)
+
+# Changed 'model' to 'mlogr_model' to match your regression step
+newdata_effort$prob <- predict(mlogr_model,
+                               newdata = newdata_effort,
+                               type = "response")
+
+# Export to PDF file #
+pdf("Surname_Curve_Effort.pdf", width = 6, height = 4)
+plot(clean_data$Effort, clean_data$Detected,
+     pch = 19,
+     xlab = "Sampling Effort (Effort)",
+     ylab = "Probability",
+     ylim = c(0,1),
+     main = "Multiple Logistic Regression Curve: Sampling Effort")
+lines(newdata_effort$Effort,
+      newdata_effort$prob,
+      col = "blue",
+      lwd = 3)
+dev.off() # Don't forget to close the PDF device!
+
+# Render output #
+plot(clean_data$Effort, clean_data$Detected,
+     pch = 19,
+     xlab = "Sampling Effort (Effort)",
+     ylab = "Probability",
+     ylim = c(0,1),
+     main = "Multiple Logistic Regression Curve: Sampling Effort")
+lines(newdata_effort$Effort,
+      newdata_effort$prob,
+      col = "blue",
+      lwd = 3)
+
+```
