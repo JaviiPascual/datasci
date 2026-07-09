@@ -28,3 +28,12 @@ PDF Map: https://JaviiPascual.github.io/datasci/Act10/Pascual_gisplot.pdf
 https://JaviiPascual.github.io/datasci/Act11/Pascual_Act11.html
 
 PDF: https://JaviiPascual.github.io/datasci/Act11/Simple_LinearRegression.pdf
+
+# Activity 12
+https://JaviiPascual.github.io/datasci/Act12/Pascual_Act12.html
+
+Map PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_PalawanMap.pdf
+
+MLogReg AverageDistance PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_Distance.pdf
+
+MLogReg Effort PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_Effort.pdf
