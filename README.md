@@ -32,6 +32,8 @@ PDF: https://JaviiPascual.github.io/datasci/Act11/Simple_LinearRegression.pdf
 # Activity 12
 https://JaviiPascual.github.io/datasci/Act12/Pascual_Act12.html
 
+Interpretation:  https://JaviiPascual.github.io/datasci/Act12/%5BLBBBI27%5D%20Pascual_Activity12_Interpretation.pdf
+
 Map PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_PalawanMap.pdf
 
 MLogReg AverageDistance PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_Distance.pdf
