@@ -1,0 +1,84 @@
+---
+title: "Pascual_randforest_reg"
+author: "Javi Pascual"
+date: "2026-07-13"
+output: html_document
+---
+
+```{r chunkA, echo=TRUE}
+### Set working directory ###
+setwd("C:/Users/Blight/Desktop/S.Y 25-26 Term 3/LBBBI27/Act13")
+
+### Package ###
+library(randomForest)
+
+### Read as dataframe ###
+my_data <- read.csv("call_data_12October2025.csv")
+
+### Remove NAs and unnecessary columns ###
+remove_NA <- complete.cases(my_data)
+head(my_data[remove_NA, ])
+clean_data <- my_data[remove_NA, ]
+
+clean_data
+
+reduced_data <- clean_data[ , 2:17]
+names(reduced_data) <- tolower(names(reduced_data))
+reduced_data$species <- as.factor(reduced_data$species)
+
+reduced_data
+
+```
+
+```{r chunkB, echo=TRUE}
+### Cartesian grid and random forest###
+
+tree_data <- c(100, 300, 500)
+mtry_data <- c(2, 4, 6)
+
+best_ooberror <- Inf
+best_ntree <- NA
+best_mtry <- NA
+
+cat("Starting manual grid search...\n\n")
+
+for(ntree in tree_data){
+  for(mtry in mtry_data){
+    
+    set.seed(123)
+    
+    temp_model <- randomForest(species ~ ., data = reduced_data, ntree = ntree, mtry = mtry, importance = TRUE)
+    
+    current_oob <- temp_model$err.rate[ntree, "OOB"]
+    
+    cat("Testing: ntree =", ntree, "| mtry =", mtry, "-> OOB Error =", current_oob, "\n")
+    
+    if(current_oob < best_ooberror){
+      best_ooberror <- current_oob
+      best_ntree <- ntree
+      best_mtry <- mtry
+    }
+  }
+}
+
+cat("\n--- Optimal Hyperparameters Found ---\n")
+cat("Best ntree :", best_ntree, "\n")
+cat("Best mtry  :", best_mtry, "\n")
+cat("Minimum OOB Error Rate:", best_ooberror, "\n\n")
+
+set.seed(123)
+
+rf_model <- randomForest(species ~ ., data = reduced_data, ntree = best_ntree, mtry = best_mtry, importance = TRUE)
+
+## Print model summary ##
+print(rf_model)
+
+## Plot ##
+varImpPlot(rf_model, main = "Random Forest Variable Importance Plot")
+
+prob_predictions <- predict(rf_model, type = "prob")
+
+cat("\nPredicted Class Probabilities Matrix Preview:\n")
+head(prob_predictions)
+
+```
