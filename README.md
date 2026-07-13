@@ -39,3 +39,6 @@ Map PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_PalawanMap.pdf
 MLogReg AverageDistance PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_Distance.pdf
 
 MLogReg Effort PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_Effort.pdf
+
+# Activity 13
+https://JaviiPascual.github.io/datasci/Act13/Pascual_Act13.html
