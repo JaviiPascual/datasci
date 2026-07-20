@@ -42,3 +42,6 @@ MLogReg Effort PDF: https://JaviiPascual.github.io/datasci/Act12/Pascual_Curve_E
 
 # Activity 13
 https://JaviiPascual.github.io/datasci/Act13/Pascual_Act13.html
+
+# Activity 14
+https://JaviiPascual.github.io/datasci/Gradient%20Boosting/%5BLBBBI27%5DUgaldePascual-Activity-14.html
